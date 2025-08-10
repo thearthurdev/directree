@@ -2,14 +2,16 @@
 <html lang="en">
 
 <head>
-     
-  <meta charset="UTF-8">
-     
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>DirecTree: Directory Tree Viewer</title>
-     
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DirecTree: Directory Tree Viewer</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -56,7 +58,6 @@
 
     .collapsible:after {
       content: '\25B6';
-      /* Right-pointing triangle */
       font-size: 16px;
       color: #555;
       float: right;
@@ -66,7 +67,6 @@
 
     .active:after {
       content: '\25BC';
-      /* Down-pointing triangle */
     }
 
     .content {
@@ -138,16 +138,14 @@
 
     li i {
       margin-right: 8px;
-      /* Space between the icon and the text */
     }
 
     li.folder {
       font-weight: bold;
     }
 
-    li.folder>i {
+    li.folder > i {
       color: #f1c40f;
-      /* Folder icon color */
     }
 
     li.file {
@@ -155,50 +153,49 @@
       color: #555;
     }
 
-    li.file>i {
+    li.file > i {
       color: #3498db;
-      /* File icon color */
     }
 
     li.folder::before {
       content: '';
-      /* We'll let the Font Awesome icon handle the collapse/expand indicator */
     }
   </style>
 </head>
 
 <body>
-
   <div class="container">
-        <h1>DirecTree: Directory Tree Viewer 🌳</h1>
-        <p>Visualize your local directory structure interactively on the web.</p>
+    <h1>DirecTree: Directory Tree Viewer 🌳</h1>
+    <p>Visualize your local directory structure interactively on the web.</p>
 
-        <div class="instructions-container">
-      <button type="button" class="collapsible active">1. Convert Directory to JSON 📁➡️📄</button>
+    <div class="instructions-container">
+      <button type="button" class="collapsible active">
+        1. Convert Directory to JSON 📁➡️📄
+      </button>
       <div class="content" style="max-height: 100px;">
         <p><strong>Step 1:</strong> Download the Python script <code>make_tree.py</code>.</p>
         <button class="download-btn" id="download-script-btn">Download make_tree.py</button>
         <p><strong>Step 2:</strong> Run the script from your terminal to generate a <code>tree.json</code> file.</p>
         <pre><code>python make_tree.py /path/to/your/directory</code></pre>
-        <p>This will create a <code>tree.json</code> file in the same directory where you ran the script, representing
-          your directory structure.</p>
+        <p>
+          This will create a <code>tree.json</code> file in the same directory
+          where you ran the script, representing your directory structure.
+        </p>
       </div>
-         
     </div>
 
-        <div class="instructions-container">
+    <div class="instructions-container">
       <h2>2. Interactive Tree Viewer 🌲</h2>
       <p>Upload the <code>tree.json</code> file you just generated to view it as a collapsible directory tree.</p>
 
       <div class="controls">
-        <input type="file" id="file-input" accept=".json">
+        <input type="file" id="file-input" accept=".json" />
         <button id="load-json-btn">Load JSON file</button>
       </div>
 
       <div id="tree-container">
         <p>Load a JSON file to see the directory tree here.</p>
       </div>
-         
     </div>
   </div>
 
@@ -211,21 +208,18 @@
 
       let directoryTree = null;
 
-      // Handle collapsible sections
-      const collapsibles = document.querySelectorAll('.collapsible');
-      collapsibles.forEach(collapsible => {
+      // Collapsible sections
+      document.querySelectorAll('.collapsible').forEach(collapsible => {
         collapsible.addEventListener('click', function () {
           this.classList.toggle('active');
           const content = this.nextElementSibling;
-          if (content.style.maxHeight) {
-            content.style.maxHeight = null;
-          } else {
-            content.style.maxHeight = content.scrollHeight + 'px';
-          }
+          content.style.maxHeight = content.style.maxHeight
+            ? null
+            : `${content.scrollHeight}px`;
         });
-        // Initial state for active collapsible
         if (collapsible.classList.contains('active')) {
-          collapsible.nextElementSibling.style.maxHeight = collapsible.nextElementSibling.scrollHeight + 'px';
+          collapsible.nextElementSibling.style.maxHeight =
+            `${collapsible.nextElementSibling.scrollHeight}px`;
         }
       });
 
@@ -236,45 +230,43 @@ import json
 import sys
 
 def path_to_dict(path):
-    d = {'name': os.path.basename(path), 'path': path}
-    if os.path.isdir(path):
-d['type'] = 'folder'
-children = [path_to_dict(os.path.join(path, x)) for x in os.listdir(path)]
-# Sort folders first, then files, then alphabetically
-children.sort(key=lambda x: (x['type'] != 'folder', x['name'].lower()))
-d['children'] = children
-    else:
-d['type'] = 'file'
-    return d
+    d = {'name': os.path.basename(path), 'path': path}
+    if os.path.isdir(path):
+        d['type'] = 'folder'
+        children = [path_to_dict(os.path.join(path, x)) for x in os.listdir(path)]
+        children.sort(key=lambda x: (x['type'] != 'folder', x['name'].lower()))
+        d['children'] = children
+    else:
+        d['type'] = 'file'
+    return d
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-print("Usage: python make_tree.py /path/to/your/directory")
-sys.exit(1)
+    if len(sys.argv) < 2:
+        print("Usage: python make_tree.py /path/to/your/directory")
+        sys.exit(1)
 
-    root_path = sys.argv[1]
-    if not os.path.isdir(root_path):
-print(f"Error: {root_path} is not a valid directory.")
-sys.exit(1)
+    root_path = sys.argv[1]
+    if not os.path.isdir(root_path):
+        print(f"Error: {root_path} is not a valid directory.")
+        sys.exit(1)
 
-    tree_data = path_to_dict(root_path)
+    tree_data = path_to_dict(root_path)
 
-    # Convert absolute paths to relative paths
-    def make_relative(node, root_path):
-if 'path' in node:
-node['path'] = os.path.relpath(node['path'], root_path)
-if node['path'] == '.':
-    node['path'] = os.path.basename(root_path)
-if 'children' in node:
-for child in node['children']:
-    make_relative(child, root_path)
+    def make_relative(node, root_path):
+        if 'path' in node:
+            node['path'] = os.path.relpath(node['path'], root_path)
+            if node['path'] == '.':
+                node['path'] = os.path.basename(root_path)
+        if 'children' in node:
+            for child in node['children']:
+                make_relative(child, root_path)
 
-    make_relative(tree_data, root_path)
+    make_relative(tree_data, root_path)
 
-    with open('tree.json', 'w') as f:
-json.dump(tree_data, f, indent=4)
-    print("Successfully created tree.json")
-`;
+    with open('tree.json', 'w') as f:
+        json.dump(tree_data, f, indent=4)
+    print("Successfully created tree.json")`;
+
         const blob = new Blob([pythonScript], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -286,96 +278,80 @@ json.dump(tree_data, f, indent=4)
         URL.revokeObjectURL(url);
       });
 
-      // Load JSON file
-      loadJsonBtn.addEventListener('click', () => {
-        fileInput.click();
-      });
-
-      fileInput.addEventListener('change', (event) => {
+      // Load JSON
+      loadJsonBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', event => {
         const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            try {
-              directoryTree = JSON.parse(e.target.result);
-              renderTree(directoryTree);
-            } catch (error) {
-              treeContainer.innerHTML = `<p style="color: red;">Error parsing JSON file. Please ensure it's a valid JSON format.</p>`;
-            }
-          };
-          reader.readAsText(file);
-        }
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            directoryTree = JSON.parse(e.target.result);
+            renderTree(directoryTree);
+          } catch {
+            treeContainer.innerHTML =
+              `<p style="color: red;">Error parsing JSON file. Please ensure it's valid.</p>`;
+          }
+        };
+        reader.readAsText(file);
       });
 
-      // Function to get the appropriate Font Awesome icon class based on file extension
+      // Icon selector
       function getIconClass(node) {
-        if (node.type === 'folder') {
-          return 'fa-folder';
-        }
-
-        const extension = node.name.split('.').pop().toLowerCase();
-        switch (extension) {
-          case 'json':
-          case 'py':
-          case 'html':
-          case 'css':
-          case 'js':
-          case 'ts':
-          case 'tsx':
-          case 'jsx':
-            return 'fa-file-code';
-          case 'md':
-          case 'txt':
-            return 'fa-file-alt';
-          case 'pdf':
-            return 'fa-file-pdf';
-          case 'jpg':
-          case 'jpeg':
-          case 'png':
-          case 'gif':
-          case 'svg':
-            return 'fa-file-image';
-          case 'zip':
-          case 'rar':
-          case 'tar':
-          case 'gz':
-            return 'fa-file-archive';
-          case 'mp3':
-          case 'wav':
-            return 'fa-file-audio';
-          case 'mp4':
-          case 'mov':
-          case 'avi':
-            return 'fa-file-video';
-          case 'doc':
-          case 'docx':
-            return 'fa-file-word';
-          case 'xls':
-          case 'xlsx':
-            return 'fa-file-excel';
-          case 'ppt':
-          case 'pptx':
-            return 'fa-file-powerpoint';
-          default:
-            return 'fa-file';
-        }
+        if (node.type === 'folder') return 'fa-folder';
+        const ext = node.name.split('.').pop().toLowerCase();
+        const map = {
+          json: 'fa-file-code',
+          py: 'fa-file-code',
+          html: 'fa-file-code',
+          css: 'fa-file-code',
+          js: 'fa-file-code',
+          ts: 'fa-file-code',
+          tsx: 'fa-file-code',
+          jsx: 'fa-file-code',
+          md: 'fa-file-alt',
+          txt: 'fa-file-alt',
+          pdf: 'fa-file-pdf',
+          jpg: 'fa-file-image',
+          jpeg: 'fa-file-image',
+          png: 'fa-file-image',
+          gif: 'fa-file-image',
+          svg: 'fa-file-image',
+          zip: 'fa-file-archive',
+          rar: 'fa-file-archive',
+          tar: 'fa-file-archive',
+          gz: 'fa-file-archive',
+          mp3: 'fa-file-audio',
+          wav: 'fa-file-audio',
+          mp4: 'fa-file-video',
+          mov: 'fa-file-video',
+          avi: 'fa-file-video',
+          doc: 'fa-file-word',
+          docx: 'fa-file-word',
+          xls: 'fa-file-excel',
+          xlsx: 'fa-file-excel',
+          ppt: 'fa-file-powerpoint',
+          pptx: 'fa-file-powerpoint',
+        };
+        return map[ext] || 'fa-file';
       }
 
-      // Render the tree
-      function renderTree(data, parentElement = treeContainer) {
-        if (parentElement === treeContainer) {
-          parentElement.innerHTML = '';
+      // Tree renderer
+      function renderTree(data, parent = treeContainer) {
+        if (parent === treeContainer) {
+          parent.innerHTML = '';
           const ul = document.createElement('ul');
           ul.appendChild(createTreeItem(data));
-          parentElement.appendChild(ul);
+          parent.appendChild(ul);
         } else {
-          parentElement.appendChild(createTreeItem(data));
+          parent.appendChild(createTreeItem(data));
         }
       }
 
       function createTreeItem(node) {
         const li = document.createElement('li');
-        li.setAttribute('data-path', node.path);
+        li.dataset.path = node.path;
 
         const icon = document.createElement('i');
         icon.classList.add('fa-solid', getIconClass(node));
@@ -387,49 +363,29 @@ json.dump(tree_data, f, indent=4)
 
         if (node.type === 'folder') {
           li.classList.add('folder');
-          li.style.cursor = 'pointer'; // Add cursor for better UX
-
-          // Create a new array and sort it. Folders first, then files, then alphabetically.
-          const sortedChildren = [...node.children].sort((a, b) => {
-            // Folders before files
-            if (a.type === 'folder' && b.type !== 'folder') {
-              return -1;
-            }
-            if (a.type !== 'folder' && b.type === 'folder') {
-              return 1;
-            }
-            // Alphabetical sort for same type
-            return a.name.localeCompare(b.name);
-          });
-
           const ul = document.createElement('ul');
-          ul.style.display = 'none'; // Ensure folders are collapsed by default
+          ul.style.display = 'none';
 
-          sortedChildren.forEach(child => {
-            ul.appendChild(createTreeItem(child));
-          });
+          [...node.children]
+            .sort((a, b) =>
+              a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1
+            )
+            .forEach(child => ul.appendChild(createTreeItem(child)));
+
           li.appendChild(ul);
-
-          li.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const target = event.target.closest('li.folder');
-            if (target) {
-              target.classList.toggle('expanded');
-              const childrenUl = target.querySelector('ul');
-              if (childrenUl) {
-                childrenUl.style.display = target.classList.contains('expanded') ? 'block' : 'none';
-              }
-            }
+          li.addEventListener('click', e => {
+            e.stopPropagation();
+            li.classList.toggle('expanded');
+            ul.style.display = li.classList.contains('expanded') ? 'block' : 'none';
           });
         } else {
           li.classList.add('file');
-          li.addEventListener('click', (event) => event.stopPropagation());
+          li.addEventListener('click', e => e.stopPropagation());
         }
         return li;
       }
     });
   </script>
-
 </body>
 
 </html>
