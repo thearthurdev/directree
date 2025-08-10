@@ -1,2 +1,2 @@
-# directree
-A vibe coded directory tree viewer
+# DirecTree
+A vibe coded directory tree viewer.
